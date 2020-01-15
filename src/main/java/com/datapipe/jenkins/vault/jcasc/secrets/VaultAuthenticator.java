@@ -12,6 +12,9 @@ public interface VaultAuthenticator {
     static VaultAuthenticator of(VaultAppRole appRole, String mountPath) {
         return new VaultAppRoleAuthenticator(appRole, mountPath);
     }
+    static VaultAuthenticator of(VaultSaRole saRole, String mountPath) {
+        return new VaultSaRoleAuthenticator(saRole, mountPath);
+    }
     static VaultAuthenticator of(VaultUsernamePassword vaultUsernamePassword, String mountPath) {
         return new VaultUserPassAuthenticator(vaultUsernamePassword, mountPath);
     }

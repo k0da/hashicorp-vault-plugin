@@ -19,7 +19,8 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Requires either CASC_VAULT_USER and CASC_VAULT_PW, or CASC_VAULT_TOKEN,
  * or CASC_VAULT_APPROLE and CASC_VAULT_APPROLE_SECRET
- * environment variables set alongside with CASC_VAULT_PATHS and CASC_VAULT_URL
+ * or CASC_VAULT_SA_ROLE environment variables set alongside with
+ * CASC_VAULT_PATHS and CASC_VAULT_URL
  */
 @Extension(optional = true)
 public class VaultSecretSource extends SecretSource {
@@ -33,6 +34,7 @@ public class VaultSecretSource extends SecretSource {
     private static final String CASC_VAULT_AGENT_ADDR = "CASC_VAULT_AGENT_ADDR";
     private static final String CASC_VAULT_MOUNT = "CASC_VAULT_MOUNT";
     private static final String CASC_VAULT_TOKEN = "CASC_VAULT_TOKEN";
+    private static final String CASC_VAULT_SAROLE = "CASC_VAULT_SA_ROLE";
     private static final String CASC_VAULT_APPROLE = "CASC_VAULT_APPROLE";
     private static final String CASC_VAULT_APPROLE_SECRET = "CASC_VAULT_APPROLE_SECRET";
     private static final String CASC_VAULT_NAMESPACE = "CASC_VAULT_NAMESPACE";
@@ -42,6 +44,7 @@ public class VaultSecretSource extends SecretSource {
     private static final String DEFAULT_ENGINE_VERSION = "2";
     private static final String DEFAULT_USER_BACKEND = "userpass";
     private static final String DEFAULT_APPROLE_BACKEND = "approle";
+    private static final String DEFAULT_SAROLE_BACKEND = "kubernetes";
 
     private Map<String, String> secrets = new HashMap<>();
     private Vault vault;
@@ -105,6 +108,7 @@ public class VaultSecretSource extends SecretSource {
         Optional<String> vaultPw = getVariable(CASC_VAULT_PW);
         Optional<String> vaultUser = getVariable(CASC_VAULT_USER);
         Optional<String> vaultToken = getVariable(CASC_VAULT_TOKEN);
+        Optional<String> vaultSaRole = getVariable(CASC_VAULT_SA_ROLE);
         Optional<String> vaultAppRole = getVariable(CASC_VAULT_APPROLE);
         Optional<String> vaultAppRoleSecret = getVariable(CASC_VAULT_APPROLE_SECRET);
 
@@ -144,6 +148,11 @@ public class VaultSecretSource extends SecretSource {
         Optional<String> mount = getVariable(CASC_VAULT_MOUNT);
         setAuthenticator(VaultAuthenticator
             .of(new VaultAppRole(approle, approleSecret), mount.orElse(DEFAULT_APPROLE_BACKEND)));
+    }
+
+    private void sarole(String sarole) {
+        setAuthenticator(VaultAuthenticator
+            .of(new VaultSaRole(sarole), mount.orElse(DEFAULT_SA_BACKEND));
     }
 
     private void readSecretsFromVault() {
